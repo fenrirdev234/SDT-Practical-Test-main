@@ -1,27 +1,25 @@
 const mongoose = require("mongoose");
 
 const reportSchema = new mongoose.Schema({
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
-  issueId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Issue",
-    required: true,
-  },
   createdAt: {
     type: Date,
     default: Date.now,
-  },
-  title: {
-    type: String,
     required: true,
-    trim: true,
   },
   description: {
     type: String,
     trim: true,
+    required: true,
+  },
+  costCode: {
+    type: String,
+    trim: true,
+    required: true,
+  },
+  issueId: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: new mongoose.mongo.ObjectId(),
+    required: true,
   },
   images: [
     {
@@ -29,33 +27,27 @@ const reportSchema = new mongoose.Schema({
         type: String, // URL of the image
         required: true,
       },
-      isDeleted: {
-        type: Boolean,
-        default: false,
+      key: {
+        type: String,
+        required: true,
+      },
+      fileType: {
+        type: String,
+        required: true,
+      },
+      fileName: {
+        type: String,
+        required: true,
       },
     },
   ],
-  type: {
-    type: String,
-    trim: true,
-  },
-  parts: {
-    type: String,
-    trim: true,
-  },
-  approvalNeeded: {
-    type: Boolean,
-    default: false,
-  },
-  links: [
-    {
-      type: String, // Assuming links are stored as URLs
-    },
-  ],
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+});
+
+reportSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.issueId = returnedObject.issueId.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
   },
 });
 
