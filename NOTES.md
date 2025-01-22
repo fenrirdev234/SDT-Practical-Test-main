@@ -33,3 +33,4 @@ but due to time constraints and the objective of this test, it wasn't cost-effec
 - With more time, I would dedicate myself to creating better documentation and implementing testing.
 - One detail I forgot to fix is that the form doesn't clear the fields when it's submitted, but it does clear the state. With a better understanding of how the Tiptap library works, I could resolve this.
 - The project needs a refactor. There's a lot of redundancy in the code.
+- There is an error about poor development in the HTML of the project. With more time, I could review where the error is and see if it's not due to a library.

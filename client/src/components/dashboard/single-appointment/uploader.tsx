@@ -14,9 +14,11 @@ import { X as XIcon } from '@phosphor-icons/react';
 import { trash } from 'ionicons/icons';
 import Pica from 'pica';
 
-import { FileDropzone, FileRejection } from '@/components/core/file-dropzone';
+import type { FileRejection } from '@/components/core/file-dropzone';
+import { FileDropzone } from '@/components/core/file-dropzone';
 import { FileIcon } from '@/components/core/file-icon';
 import { toast } from '@/components/core/toaster';
+import type { InterfaceReport } from '@/types/report';
 
 interface ExtendedFile extends File {
   preview: string;
@@ -35,8 +37,8 @@ function bytesToSize(bytes: number, decimals = 2): string {
 }
 
 export interface UploaderProps {
-  report: any;
-  setReport: React.Dispatch<React.SetStateAction<any>>; 
+  report:  InterfaceReport
+  setReport: React.Dispatch<React.SetStateAction< InterfaceReport>>; 
   onClose?: () => void;
   open?: boolean;
 }
@@ -68,9 +70,9 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
   const MAX_FILE_SIZE_SINGLE = 70 * 1024 * 1024; // 70 MB in bytes
   const MAX_FILE_COUNT = 50;
 
-  React.useEffect(() => {
+/*   React.useEffect(() => {
     setFiles(report.images);
-  }, [open]);
+  }, [open]); */
 
 
   const handleDrop = React.useCallback(
@@ -96,7 +98,7 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
       try {
         const resizedFiles: ExtendedFile[] = [];
         for (const file of newFiles) {
-          const newFilename = `${file.name}`;
+          const newFilename = file.name;
           let blob;
           if (file.size > 2 * 1024 * 1024) {
             // Only resize if file size > 3MB
@@ -124,13 +126,26 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
           resizedFiles.push(resizedFile);
           setProcessingCount((prevCount) => prevCount + 1);
         }
-
+        
         // Update your application's state with the resized files
         setFiles((prevFiles) => [...prevFiles, ...resizedFiles]);
-        setReport((prevReport: any) => ({
+
+        setReport((prevReport) => ({
+          ...prevReport,
+          images:[...prevReport.images, {
+            url:encodeURI(`https://example.com/${resizedFiles[0].name.replace(/\s/g, "")}`),
+            key: resizedFiles[0].name.split(".")[0],
+            fileType: resizedFiles[0].type,
+            fileName: resizedFiles[0].name.replace(/\s/g, "")
+          }]
+        /*   images: [...prevReport.images, ...resizedFiles], */
+        }));
+
+
+        /* setReport((prevReport: any) => ({
           ...prevReport,
           images: [...prevReport.images, ...resizedFiles],
-        }));
+        })); */
       } catch (error) {
         console.error('Error during file processing:', error);
       } finally {
@@ -150,7 +165,7 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
     img.src = imageURL;
 
     await new Promise<void>((resolve, reject) => {
-      img.onload = () => resolve();
+      img.onload = () => { resolve(); };
       img.onerror = (error) => {
         console.error('Image failed to load', error);
         reject(error);
@@ -240,9 +255,9 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
   const handleRemove = React.useCallback(
     (file: ExtendedFile) => {
       setFiles((prevFiles) => prevFiles.filter((_file) => _file.name !== file.name));
-      setReport((prevReport: any) => ({
+      setReport((prevReport) => ({
         ...prevReport,
-        images: prevReport.images.filter((img: ExtendedFile) => img.name !== file.name),
+        images: prevReport.images.filter(img => img.fileName !== file.name),
       }));
     },
     [setReport]
@@ -250,20 +265,20 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
 
   const handleRemoveAll = React.useCallback(() => {
     setFiles([]);
-    setReport((prevReport: any) => ({
+    setReport((prevReport) => ({
       ...prevReport,
       images: [],
     }));
   }, [setReport]);
 
-  const handleUploadMore = () => {
+  const handleUploadMore = ():void => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
 
   const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newFiles = Array.from(event.target.files || []) as File[];
+    const newFiles = Array.from(event.target.files || []);
     handleDrop(newFiles);
   };
 
@@ -281,7 +296,7 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
         }}
       >
         <Typography variant="h6">Upload photos or files</Typography>
-        <Typography color={'var(--mui-palette-warning-main)'} variant="body2">
+        <Typography color="var(--mui-palette-warning-main)" variant="body2">
           {`${bytesToSize(MAX_FILE_SIZE)} or ${MAX_FILE_COUNT} files max`}
         </Typography>
         {isProcessing ? <Box
@@ -336,17 +351,17 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
           <Stack spacing={2}>
             <Stack component="ul" spacing={1} sx={{ listStyle: 'none', m: 0, p: 0 }}>
               <Typography
-                sx={{ margin: 'auto' }}
                 color={
                   files.length <= MAX_FILE_COUNT ? 'var(--mui-palette-info-main)' : 'var(--mui-palette-error-main)'
                 }
+                sx={{ margin: 'auto' }}
                 variant="h6"
               >
                 {files.length} out of {MAX_FILE_COUNT} allowed
               </Typography>
               <Typography
-                sx={{ margin: 'auto' }}
                 color={totalSize <= MAX_FILE_SIZE ? 'var(--mui-palette-info-main)' : 'var(--mui-palette-error-main)'}
+                sx={{ margin: 'auto' }}
                 variant="h6"
               >
                 Total size: {bytesToSize(totalSize)}
@@ -357,7 +372,8 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
                 const extension = file.name.split('.').pop()?.toLowerCase();
                 return (
                   <Stack
-                    component="li"
+                   /*  component="li" */
+                   component="div"
                     direction="row"
                     key={file.name}
                     spacing={2}
@@ -379,6 +395,7 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
                     >
                       {extension === 'pdf' ? (
                         <object
+                          aria-label={`Preview of ${file.name}`}
                           data={file.preview}
                           style={{
                             objectFit: 'cover',
@@ -386,7 +403,6 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
                             width: '100%',
                           }}
                           type={file.type}
-                          aria-label={`Preview of ${file.name}`}
                         />
                       ) : extension === 'mp4' ||
                         extension === 'mpeg' ||
@@ -394,12 +410,12 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
                         extension === 'mov' ||
                         extension === 'webm' ? (
                         <video
-                          className="hidden-ios-video-controls"
-                          src={file.preview}
                           autoPlay={false}
+                          className="hidden-ios-video-controls"
+                          controls={false}
                           loop
                           muted
-                          controls={false}
+                          src={file.preview}
                           style={{
                             objectFit: 'cover',
                             height: '100%',
@@ -408,9 +424,9 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
                          />
                       ) : (
                         <img
-                          src={file.preview}
                           alt={file.name}
                           loading="lazy"
+                          src={file.preview}
                           style={{
                             objectFit: 'cover',
                             height: '100%',
@@ -430,13 +446,13 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
                       }}
                     >
                       <Typography
-                        variant="subtitle2"
                         sx={{
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           maxWidth: '50vw',
                         }}
+                        variant="subtitle2"
                       >
                         {file.name}
                       </Typography>
@@ -446,7 +462,7 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
                     </Box>
                     <FileIcon extension={extension || ''} />
                     <Tooltip title="Remove">
-                      <IconButton onClick={() => handleRemove(file)}>
+                      <IconButton onClick={() => { handleRemove(file); }}>
                         <XIcon />
                       </IconButton>
                     </Tooltip>
@@ -465,17 +481,17 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
                 }}
               >
                 <IonButton
+                  color="danger"
                   onClick={handleRemoveAll}
+                  size="small"
                   sx={{
                     textDecoration: 'underline',
                     justifyContent: 'center',
                     lineHeight: '1rem',
                   }}
                   variant="primary"
-                  color="danger"
-                  size="small"
                 >
-                  <IonIcon slot="start" icon={trash}></IonIcon>
+                  <IonIcon icon={trash} slot="start" />
                   Remove all
                 </IonButton>
               </Stack>
@@ -502,12 +518,12 @@ export function Uploader({ report, setReport, onClose }: UploaderProps): React.J
 
       {/* Hidden file input */}
       <input
-        type="file"
+        accept={Object.keys(ACCEPTED_FILE_TYPES).join(',')}
+        multiple
+        onChange={handleFileInputChange}
         ref={fileInputRef}
         style={{ display: 'none' }}
-        accept={Object.keys(ACCEPTED_FILE_TYPES).join(',')}
-        onChange={handleFileInputChange}
-        multiple
+        type="file"
       />
     </Box>
   );

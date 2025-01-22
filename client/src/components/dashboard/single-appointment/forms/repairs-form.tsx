@@ -11,12 +11,12 @@ import { Uploader } from '@/components/dashboard/single-appointment/uploader';
 import { useFormHook } from './form-hooks';
 import { type InterfaceReport } from '@/types/report';
 
-interface ReportFormProps {
+interface RepairsFormProps {
   report: InterfaceReport;
-  setReport: React.Dispatch<React.SetStateAction<InterfaceReport>>;
+  setReport: React.Dispatch<React.SetStateAction< InterfaceReport>>;
 }
 
-export function GeneralForm({ report, setReport }: ReportFormProps): JSX.Element {
+export function RepairsForm({ report, setReport }: RepairsFormProps): JSX.Element {
 
   const {
     handleFieldChange,
@@ -46,7 +46,7 @@ export function GeneralForm({ report, setReport }: ReportFormProps): JSX.Element
           <TextEditor
             content={report.description || ''}
             onUpdate={(content) => {
-              handleFieldChange('description', content);
+              handleFieldChange('costCode', content);
             }}
             placeholder="C100 - C203 - C880"
           />

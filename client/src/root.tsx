@@ -22,7 +22,7 @@ function Root({ children }: RootProps) {
 
       <ThemeProvider>
         {children}
-        <Toaster position="bottom-right" />
+        <Toaster position="bottom-right" richColors />
       </ThemeProvider>
     </HelmetProvider>
   );

@@ -1,3 +1,4 @@
+import type { InterfaceReport } from '@/types/report';
 import type * as React from 'react';
 import { useCallback, useState } from 'react';
 // import type { Report } from '@/interfaces/tables';
@@ -6,15 +7,15 @@ interface UseFormHookReturnType {
   isDescriptionValid: boolean;
   selectedOption: string;
   validateForm: () => void;
-  updateTitle: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleFieldChange: (field: keyof Report, value: Report[keyof Report]) => void;
+  updateCostCode: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleFieldChange: (field: keyof InterfaceReport, value: InterfaceReport[keyof InterfaceReport]) => void;
   handleSelectionChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-  handleKeyAdd: <K extends keyof Report>(field: K, value: Report[K]) => void;
+  handleKeyAdd: <K extends keyof InterfaceReport>(field: K, value: InterfaceReport[K]) => void;
 }
 
 interface UseFormHookParams {
-  report: Report;
-  setReport: React.Dispatch<React.SetStateAction<Report>>;
+  report: InterfaceReport;
+  setReport: React.Dispatch<React.SetStateAction<InterfaceReport>>;
 }
 
 export const useFormHook = ({ report, setReport }: UseFormHookParams): UseFormHookReturnType => {
@@ -22,8 +23,8 @@ export const useFormHook = ({ report, setReport }: UseFormHookParams): UseFormHo
   const [selectedOption, setSelectedOption] = useState<string>('');
 
   const handleFieldChange = useCallback(
-    (field: keyof Report, value: Report[keyof Report]) => {
-      setReport((prev: Report) => ({ ...prev, [field]: value }));
+    (field: keyof InterfaceReport, value: InterfaceReport[keyof InterfaceReport]) => {
+      setReport((prev) => ({ ...prev, [field]: value }));
     },
     [setReport]
   );
@@ -32,9 +33,9 @@ export const useFormHook = ({ report, setReport }: UseFormHookParams): UseFormHo
     setIsDescriptionValid(Boolean(report?.description?.trim()));
   }, [report?.description]);
 
-  const updateTitle: UseFormHookReturnType['updateTitle'] = useCallback(
+  const updateCostCode: UseFormHookReturnType['updateCostCode'] = useCallback(
     (event) => {
-      handleFieldChange('title', event.target.value);
+      handleFieldChange('costCode', event.target.value.trim());
     },
     [handleFieldChange]
   );
@@ -45,7 +46,7 @@ export const useFormHook = ({ report, setReport }: UseFormHookParams): UseFormHo
   }, []);
 
   const handleKeyAdd: UseFormHookReturnType['handleKeyAdd'] = useCallback(
-    <K extends keyof Report>(field: K, value: Report[K]) => {
+    <K extends keyof InterfaceReport>(field: K, value: InterfaceReport[K]) => {
       handleFieldChange(field, value);
     },
     [handleFieldChange]
@@ -55,7 +56,7 @@ export const useFormHook = ({ report, setReport }: UseFormHookParams): UseFormHo
     isDescriptionValid,
     selectedOption,
     validateForm,
-    updateTitle,
+    updateCostCode,
     handleFieldChange,
     handleSelectionChange,
     handleKeyAdd,

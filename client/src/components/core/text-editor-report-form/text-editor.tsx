@@ -12,7 +12,7 @@ export interface TextEditorProps {
   content: EditorOptions['content'];
   editable?: EditorOptions['editable'];
   hideToolbar?: boolean;
-  onUpdate?: EditorOptions['onUpdate'];
+  onUpdate:(info:string)=>void ;
   placeholder?: string;
 }
 
@@ -20,7 +20,7 @@ export function TextEditor({
   content,
   editable = true,
   hideToolbar,
-  onUpdate = () => {},
+  onUpdate ,
   placeholder,
 }: TextEditorProps): React.JSX.Element {
   const extensions = [
@@ -34,7 +34,7 @@ export function TextEditor({
     content,
     editable,
     onUpdate: ({ editor }) => {
-      onUpdate(editor.getHTML()); // Make sure to call the passed onUpdate function
+      onUpdate(editor.getText().trim()); // Make sure to call the passed onUpdate function
     },
   });
 

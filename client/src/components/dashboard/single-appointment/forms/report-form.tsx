@@ -9,16 +9,17 @@ import {
 } from '@mui/material';
 
 import { useFormHook } from './form-hooks';
-import { GeneralForm } from './general-form';
+
+import { RepairsForm } from './repairs-form';
+import { type InterfaceReport } from '@/types/report';
 
 interface ReportFormProps {
   loading: boolean;
-  report: Report; // Define a more specific type if possible
-  setReport: React.Dispatch<React.SetStateAction<Report>>;
+  report: InterfaceReport; // Define a more specific type if possible
+  setReport: React.Dispatch<React.SetStateAction<InterfaceReport>>;
   sendReportToDatabase: () => void;
-  formType: string;
 }
-  
+
   // NOTE TO CANDIDATE
   // report and setReport are the main props that are passed to the form
 
@@ -26,18 +27,17 @@ export function ReportForm({
   loading,
   report,
   setReport,
-  sendReportToDatabase,
-  formType,
+  sendReportToDatabase
 }: ReportFormProps): JSX.Element {
 
-  const { validateForm, handleFieldChange } = useFormHook({
+  const { validateForm } = useFormHook({
     report,
     setReport,
   });
 
-  useEffect(() => {
+  /* useEffect(() => {
     handleFieldChange('type', formType);
-  }, [formType, handleFieldChange]);
+  }, [formType, handleFieldChange]); */
 
   useEffect(() => {
     validateForm();
@@ -46,9 +46,9 @@ export function ReportForm({
   return (
     <Box sx={{ sm: { padding: 0 }, md: { padding: 3 } }}>
       <Stack spacing={3}>
-
+        <RepairsForm  report={report} setReport={setReport}/>
         {/* Directly render the appropriate form component */}
-          <GeneralForm report={report} setReport={setReport} />
+          {/* <GeneralForm report={report} setReport={setReport} /> */}
 
         {/* NOTE TO CANDIDATE */}
         {/* We are keen on implementing forms in a modular way. So they can be combined and imported form any part of the application*/}
@@ -59,7 +59,7 @@ export function ReportForm({
 
         <Button
           disabled={loading} // Disable button if form is invalid or loading is true
-          onClick={sendReportToDatabase}
+          onClick={()=>{ sendReportToDatabase()}}
           size="large"
           sx={{ width: '100%' }}
           variant="outlined"
